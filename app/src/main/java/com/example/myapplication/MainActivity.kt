@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.retrofit.Character
 import com.example.myapplication.retrofit.CharacterApi
+import com.example.myapplication.retrofit.RetrofitClient
 import kotlinx.coroutines.*
 import okhttp3.Request
 import okio.Timeout
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
     private lateinit var adapter: NewAdapter
+    private lateinit var сharacterApi: CharacterApi
+
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,13 +37,10 @@ class MainActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
-
-        val retrofit = Retrofit.Builder().baseUrl("https://rickandmortyapi.com/api/")
-            .addConverterFactory(GsonConverterFactory.create()).build()
-        val characterApi = retrofit.create(CharacterApi::class.java)
+        сharacterApi = RetrofitClient.сharacterApi
 
         GlobalScope.launch {
-            val characters = characterApi.getCharacter()
+            val characters = сharacterApi.getCharacter()
             runOnUiThread {
                 val characters2 = characters.results
                 adapter.setData(characters2)
