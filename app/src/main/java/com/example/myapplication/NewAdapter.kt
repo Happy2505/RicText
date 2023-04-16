@@ -1,10 +1,14 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.wifi.p2p.WifiP2pManager.ActionListener
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.databinding.ActivityDescripionsBinding
 import com.example.myapplication.databinding.ActivityMainBinding
@@ -12,15 +16,21 @@ import com.example.myapplication.databinding.ListItemBinding
 import com.example.myapplication.retrofit.Character
 import com.squareup.picasso.Picasso
 
-class NewAdapter : RecyclerView.Adapter<NewAdapter.NewAdapterHolder>() {
+interface CharacterListener {
+    fun onCharacterDetail(character: Character)
+}
+
+class NewAdapter : RecyclerView.Adapter<NewAdapter.NewAdapterHolder>(), View.OnClickListener {
 
     var list: List<Character> = emptyList()
-//        @SuppressLint("NotifyDataSetChanged")
+
+    //        @SuppressLint("NotifyDataSetChanged")
 //        set(newValue){
 //            field = newValue
 //            notifyDataSetChanged()
 //        }
-    fun setData(list  : List<Character>){
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(list: List<Character>) {
         this.list = list as ArrayList<Character>
         notifyDataSetChanged()
     }
@@ -31,7 +41,8 @@ class NewAdapter : RecyclerView.Adapter<NewAdapter.NewAdapterHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewAdapterHolder {
         val inflate = LayoutInflater.from(parent.context)
-        val binding = ListItemBinding.inflate(inflate,parent,false)
+        val binding = ListItemBinding.inflate(inflate, parent, false)
+        binding.root.setOnClickListener(this)
         return NewAdapterHolder(binding)
     }
 
@@ -41,11 +52,19 @@ class NewAdapter : RecyclerView.Adapter<NewAdapter.NewAdapterHolder>() {
 
     override fun onBindViewHolder(holder: NewAdapterHolder, position: Int) {
         val character = list[position]
-        with(holder.binding){
+        with(holder.binding) {
+            holder.itemView.tag = character
             Picasso.get().load(character.image).into(logo)
             Name.text = character.name
             species.text = character.species
             gender.text = character.gender
         }
+    }
+
+    override fun onClick(v: View) {
+        val cha: Character = v.tag as Character
+        val i = Intent(v.context, Descripions::class.java)
+        i.putExtra("id", cha.id)
+        v.context.startActivity(i)
     }
 }
